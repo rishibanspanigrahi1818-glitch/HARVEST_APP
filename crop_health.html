@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Health Monitoring - Smart Post-Harvest Decision System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        select:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: scale(1.02);
+        }
+        .section-title {
+            font-size: 18px;
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        .info-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+        .health-excellent { color: #27ae60; }
+        .health-good { color: #52c41a; }
+        .health-fair { color: #f39c12; }
+        .health-poor { color: #e67e22; }
+        .health-critical { color: #e74c3c; }
+        .nav-bar {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .user-info {
+            color: white;
+            font-weight: 600;
+        }
+        .user-info a {
+            color: white;
+            margin-left: 10px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .issue-list, .recommendation-list {
+            list-style: none;
+            padding: 0;
+        }
+        .issue-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            color: #e74c3c;
+        }
+        .issue-list li:before {
+            content: "⚠️ ";
+            margin-right: 8px;
+        }
+        .recommendation-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            color: #27ae60;
+        }
+        .recommendation-list li:before {
+            content: "✓ ";
+            margin-right: 8px;
+            font-weight: bold;
+        }
+        .weather-box {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        .weather-box h3 {
+            margin-bottom: 10px;
+        }
+        .crop-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .crop-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .crop-tag.recommended {
+            background: #27ae60;
+        }
+        .crop-tag.avoid {
+            background: #e74c3c;
+        }
+        .health-score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            border: 5px solid;
+        }
+        .health-score-circle.excellent { border-color: #27ae60; background: #e8f8f0; }
+        .health-score-circle.good { border-color: #52c41a; background: #f0f8e8; }
+        .health-score-circle.fair { border-color: #f39c12; background: #fef9e7; }
+        .health-score-circle.poor { border-color: #e67e22; background: #fdf2e9; }
+        .health-score-circle.critical { border-color: #e74c3c; background: #fdedec; }
+        .health-score-circle .score {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        .health-score-circle .label {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <div class="nav-bar">
+            <div class="nav-links">
+                <a href="{{ url_for('index') }}">🏠 Home</a>
+                <a href="{{ url_for('crop_health') }}">🌱 Crop Health</a>
+            </div>
+            <div class="user-info">
+                {{ farmer_name }}
+                <a href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+
+        <h1>🌱 Crop Health Monitoring</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div style="margin-bottom: 20px;">
+                {% for category, message in messages %}
+                <div style="padding: 12px 15px; border-radius: 8px; margin-bottom: 10px;
+                    {% if category == 'error' %}background: #fee; border-left: 4px solid #c00; color: #c00;
+                    {% elif category == 'success' %}background: #efe; border-left: 4px solid #2a2; color: #2a2;
+                    {% else %}background: #eef; border-left: 4px solid #44a; color: #44a;{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Input Form -->
+        <div class="card">
+            <h2 class="section-title">Assess Crop Health</h2>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="crop_type">Crop Type</label>
+                    <select name="crop_type" id="crop_type" required>
+                        <option value="">Select Crop</option>
+                        {% for crop in crops %}
+                        <option value="{{ crop }}">{{ crop.title() }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="leaf_condition">Leaf Condition</label>
+                    <select name="leaf_condition" id="leaf_condition" required>
+                        <option value="healthy_green">Healthy Green</option>
+                        <option value="slight_yellowing">Slight Yellowing</option>
+                        <option value="significant_yellowing">Significant Yellowing</option>
+                        <option value="spots_present">Spots Present</option>
+                        <option value="wilting">Wilting</option>
+                        <option value="dried_edges">Dried Edges</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="pest_presence">Pest Presence</label>
+                    <select name="pest_presence" id="pest_presence" required>
+                        <option value="none">None Visible</option>
+                        <option value="few_visible">Few Visible</option>
+                        <option value="moderate">Moderate Infestation</option>
+                        <option value="severe">Severe Infestation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="soil_moisture">Soil Moisture Level</label>
+                    <select name="soil_moisture" id="soil_moisture" required>
+                        <option value="optimal">Optimal</option>
+                        <option value="slightly_dry">Slightly Dry</option>
+                        <option value="very_dry">Very Dry</option>
+                        <option value="waterlogged">Waterlogged</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="growth_stage">Growth Stage</label>
+                    <select name="growth_stage" id="growth_stage" required>
+                        <option value="seedling">Seedling</option>
+                        <option value="vegetative">Vegetative</option>
+                        <option value="flowering">Flowering</option>
+                        <option value="fruiting">Fruiting</option>
+                        <option value="mature">Mature</option>
+                    </select>
+                </div>
+                <button type="submit">Assess Health</button>
+            </form>
+        </div>
+
+        {% if result %}
+            {% if result.error %}
+            <div class="card">
+                <div style="background: #fee; border-left: 4px solid #c00; padding: 15px; border-radius: 8px; color: #c00;">
+                    {{ result.error }}
+                </div>
+            </div>
+            {% else %}
+
+            <!-- Health Score -->
+            <div class="card">
+                <h2 class="section-title">📊 Health Assessment - {{ result.crop_type }}</h2>
+                <div class="health-score-circle {{ result.health.status|lower }}">
+                    <span class="score">{{ result.health.health_score }}</span>
+                    <span class="label">/ 100</span>
+                </div>
+                <div style="text-align: center; margin-top: 15px;">
+                    <span class="info-label">Status: </span>
+                    <span class="health-{{ result.health.status|lower }}" style="font-weight: 700; font-size: 18px;">
+                        {{ result.health.status }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Input Summary -->
+            <div class="card">
+                <h2 class="section-title">📋 Assessment Details</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Leaf Condition</div>
+                        <div class="info-value" style="font-size: 18px;">{{ result.leaf_condition }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Pest Level</div>
+                        <div class="info-value" style="font-size: 18px;">{{ result.pest_presence }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Soil Moisture</div>
+                        <div class="info-value" style="font-size: 18px;">{{ result.soil_moisture }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Growth Stage</div>
+                        <div class="info-value" style="font-size: 18px;">{{ result.growth_stage }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Issues Detected -->
+            {% if result.health.issues %}
+            <div class="card">
+                <h2 class="section-title">⚠️ Issues Detected</h2>
+                <ul class="issue-list">
+                    {% for issue in result.health.issues %}
+                    <li>{{ issue }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Recommendations -->
+            <div class="card">
+                <h2 class="section-title">✅ Recommendations</h2>
+                <ul class="recommendation-list">
+                    {% for rec in result.health.recommendations %}
+                    <li>{{ rec }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Weather-based Recommendations -->
+            {% if weather_rec %}
+            <div class="card">
+                <h2 class="section-title">🌤️ Weather-wise Recommendations</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Current Temperature</div>
+                        <div class="info-value">{{ weather_rec.current_temp }}°C</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Weather Condition</div>
+                        <div class="info-value" style="font-size: 18px;">{{ weather_rec.condition }}</div>
+                    </div>
+                </div>
+
+                <div class="weather-box">
+                    <h3>💡 General Advice</h3>
+                    <p>{{ weather_rec.general_advice }}</p>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <div class="info-label">Recommended Crops for Current Weather:</div>
+                    <div class="crop-list">
+                        {% for crop in weather_rec.recommended_crops %}
+                        <span class="crop-tag recommended">✓ {{ crop }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {% if weather_rec.avoid_crops %}
+                <div style="margin-top: 15px;">
+                    <div class="info-label">Crops to Avoid:</div>
+                    <div class="crop-list">
+                        {% for crop in weather_rec.avoid_crops %}
+                        <span class="crop-tag avoid">✗ {{ crop }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>
